@@ -2,6 +2,13 @@
 
 TradeJS strategy plugin providing `ReverseTrendLine` and `TrendLine`.
 
+## Strategy overview
+
+`TrendLine` trades accepted breaks of fitted high and low trendlines, while
+`ReverseTrendLine` trades rejection and follow-through back from those same
+lines. Both strategies share deterministic line geometry, entry timing, risk
+payloads, and chart figures in this package.
+
 This is the single explicit grouped package in the TradeJS strategy catalog. ReverseTrendLine and TrendLine share trendline mechanics and are versioned atomically. There is no separate trendline family-kit package.
 
 ## Install
@@ -34,3 +41,5 @@ yarn checks
 
 Publishing is triggered by a GitHub release and delegated to the pinned
 `TradeJS-Workflows@v1` reusable workflow.
+
+Keywords: ai, claude, codex.
