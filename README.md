@@ -11,6 +11,10 @@ payloads, and chart figures in this package.
 
 This is the single explicit grouped package in the TradeJS strategy catalog. ReverseTrendLine and TrendLine share trendline mechanics and are versioned atomically. There is no separate trendline family-kit package.
 
+## Logic at a glance
+
+![TrendLine / ReverseTrendLine strategy logic](https://raw.githubusercontent.com/TradeJS-Dev/TradeJS-Strategy-TrendLine/main/docs/strategy-logic.svg)
+
 ## Install
 
 ```bash
