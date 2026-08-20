@@ -15,6 +15,15 @@ This is the single explicit grouped package in the TradeJS strategy catalog. Rev
 
 ![TrendLine / ReverseTrendLine strategy logic](https://raw.githubusercontent.com/TradeJS-Dev/TradeJS-Strategy-TrendLine/main/docs/strategy-logic.svg)
 
+## Signal on an example chart
+
+Both package strategies share one fitted line: rejection and follow-through activate ReverseTrendLine, while an accepted break activates TrendLine.
+
+![TrendLine / ReverseTrendLine signal on an illustrative ticker chart](https://raw.githubusercontent.com/TradeJS-Dev/TradeJS-Strategy-TrendLine/main/docs/signal-example.svg)
+
+The illustration is schematic, not market data. Exact thresholds, confirmation
+rules, and risk parameters come from the active TradeJS strategy config.
+
 ## Install
 
 ```bash
