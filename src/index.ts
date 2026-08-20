@@ -1,11 +1,12 @@
 import { defineStrategyPlugin } from "@tradejs/core/config";
-import type { StrategyConfig, StrategyRegistryEntry } from "@tradejs/types";
+import type { ValidatedStrategyRegistryEntry } from "@tradejs/strategy-kit/config";
+import type { StrategyConfig } from "@tradejs/types";
 import { config as reverseTrendLineDefaultConfig } from "./ReverseTrendLine/config";
 import { ReverseTrendLineStrategyDefinition } from "./ReverseTrendLine/strategy";
 import { config as trendLineDefaultConfig } from "./TrendLine/config";
 import { TrendlineStrategyDefinition } from "./TrendLine/strategy";
 
-export const strategyEntries: StrategyRegistryEntry[] = [
+export const strategyEntries: ValidatedStrategyRegistryEntry<any>[] = [
   ReverseTrendLineStrategyDefinition,
   TrendlineStrategyDefinition,
 ];
