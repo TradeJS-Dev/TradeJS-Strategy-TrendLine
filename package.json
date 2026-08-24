@@ -1,6 +1,6 @@
 {
   "name": "@tradejs/strategy-trend-line",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Trendline family for TradeJS: TrendLine trades breakouts while ReverseTrendLine trades rejections using shared geometry and risk controls.",
   "type": "module",
   "packageManager": "yarn@4.13.0",
