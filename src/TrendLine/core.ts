@@ -1,4 +1,5 @@
 import { round } from "@tradejs/core/math";
+import { buildTradeEconomics } from "@tradejs/strategy-kit/risk";
 import { createTrendlineEngine } from "@tradejs/core/indicators";
 
 import { TrendLineConfig } from "./config";
@@ -87,7 +88,7 @@ export const createTrendLineCore: CreateStrategyCore<
   TrendLineConfig,
   IndicatorsHistorySnapshot | undefined
 > = async ({ config, data: cachedData, strategyApi, indicatorsState }) => {
-  const { TRENDLINE, FEE_PERCENT, MAX_LOSS_VALUE, HIGHS, LOWS } = config;
+  const { TRENDLINE, RISK_FEE_RATE, MAX_LOSS_VALUE, HIGHS, LOWS } = config;
 
   const lastTradeController = strategyApi.createLastTradeController({
     enabled: true,
@@ -264,16 +265,26 @@ export const createTrendLineCore: CreateStrategyCore<
       timingContext,
     });
 
-    const { stopLossPrice, takeProfitPrice, riskRatio, qty } =
+    const { stopLossPrice, takeProfitPrice } =
       strategyApi.getDirectionalTpSlPrices({
         price: currentPrice,
         direction,
         takeProfitDelta: riskPlan.takeProfitDelta,
         stopLossDelta: riskPlan.stopLossDelta,
         unit: "percent",
-        maxLossValue: MAX_LOSS_VALUE,
-        feePercent: Number(FEE_PERCENT ?? 0),
       });
+
+    const economics = buildTradeEconomics({
+      entryPrice: currentPrice,
+      stopLossPrice,
+      takeProfitPrice,
+      feeRate: Number(RISK_FEE_RATE),
+      slippageBps: config.RISK_SLIPPAGE_BPS + config.RISK_MARKET_IMPACT_BPS,
+    });
+    const qty =
+      economics.lossPerUnit > 0 ? MAX_LOSS_VALUE / economics.lossPerUnit : 0;
+    // Preserve this strategy's gross-RR admission policy; costs affect sizing.
+    const riskRatio = economics.grossRiskRatio;
 
     if (!qty || !Number.isFinite(qty) || qty <= 0) {
       return strategyApi.skip("INVALID_QTY");

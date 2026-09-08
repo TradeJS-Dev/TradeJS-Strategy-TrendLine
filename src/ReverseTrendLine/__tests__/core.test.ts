@@ -233,12 +233,9 @@ describe("createReverseTrendLineCore", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     activeIndicatorsState = undefined;
-    (getDirectionalTpSlPrices as jest.Mock).mockReturnValue({
-      stopLossPrice: 99,
-      takeProfitPrice: 102.2,
-      riskRatio: 2.0,
-      qty: 1,
-    });
+    (getDirectionalTpSlPrices as jest.Mock).mockImplementation(
+      jest.requireActual("@tradejs/core/strategies").getDirectionalTpSlPrices,
+    );
     (buildEntrySignalDecision as jest.Mock).mockImplementation(
       (params: any) => ({
         kind: "entry",

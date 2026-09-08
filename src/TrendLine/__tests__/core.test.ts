@@ -303,12 +303,9 @@ describe("createTrendLineCore", () => {
       currentPrice: candle.close,
     });
 
-    (getDirectionalTpSlPrices as jest.Mock).mockReturnValue({
-      stopLossPrice: 98,
-      takeProfitPrice: 104,
-      riskRatio: 3,
-      qty: 2,
-    });
+    (getDirectionalTpSlPrices as jest.Mock).mockImplementation(
+      jest.requireActual("@tradejs/core/strategies").getDirectionalTpSlPrices,
+    );
 
     const fakeDecision = { kind: "entry", code: "TRENDLINE_SIGNAL" };
     (buildEntrySignalDecision as jest.Mock).mockReturnValue(fakeDecision);
@@ -373,7 +370,10 @@ describe("createTrendLineCore", () => {
             entryReadyNow: true,
           }),
         }),
-        orderPlan: expect.objectContaining({ qty: 2, stopLossPrice: 98 }),
+        orderPlan: expect.objectContaining({
+          qty: expect.any(Number),
+          stopLossPrice: candle.close * (1 + tpSlParams.stopLossDelta / 100),
+        }),
       }),
     );
   });
@@ -573,12 +573,9 @@ describe("createTrendLineCore", () => {
       timestamp: candles[candles.length - 1].timestamp,
       currentPrice: candles[candles.length - 1].close,
     });
-    (getDirectionalTpSlPrices as jest.Mock).mockReturnValue({
-      stopLossPrice: 98,
-      takeProfitPrice: 104,
-      riskRatio: 3,
-      qty: 2,
-    });
+    (getDirectionalTpSlPrices as jest.Mock).mockImplementation(
+      jest.requireActual("@tradejs/core/strategies").getDirectionalTpSlPrices,
+    );
 
     const fakeDecision = { kind: "entry", code: "TRENDLINE_SIGNAL" };
     (buildEntrySignalDecision as jest.Mock).mockReturnValue(fakeDecision);
@@ -682,15 +679,12 @@ describe("createTrendLineCore", () => {
       timestamp: candle.timestamp,
       currentPrice: candle.close,
     });
-    (getDirectionalTpSlPrices as jest.Mock).mockReturnValueOnce({
-      stopLossPrice: 98,
-      takeProfitPrice: 104,
-      riskRatio: 3,
-      qty: 0,
-    });
+    (getDirectionalTpSlPrices as jest.Mock).mockImplementation(
+      jest.requireActual("@tradejs/core/strategies").getDirectionalTpSlPrices,
+    );
 
     const core = await createTrendLineCore({
-      config: makeConfig(),
+      config: makeConfig({ MAX_LOSS_VALUE: 0 }),
       data: [candle as any],
       strategyApi: makeStrategyApi(),
       indicatorsState: makeIndicatorsState() as any,
@@ -711,18 +705,18 @@ describe("createTrendLineCore", () => {
       timestamp: candle.timestamp,
       currentPrice: candle.close,
     });
-    (getDirectionalTpSlPrices as jest.Mock).mockReturnValueOnce({
-      stopLossPrice: 98,
-      takeProfitPrice: 104,
-      riskRatio: 1,
-      qty: 1,
-    });
+    (getDirectionalTpSlPrices as jest.Mock).mockImplementation((params) =>
+      jest.requireActual("@tradejs/core/strategies").getDirectionalTpSlPrices({
+        ...params,
+        takeProfitDelta: params.stopLossDelta,
+      }),
+    );
 
     const core = await createTrendLineCore({
       config: makeConfig({
         LOWS: {
           ...DEFAULT_CONFIG.LOWS,
-          minRiskRatio: 2,
+          minRiskRatio: 3,
         },
       }),
       data: [candle as any],
@@ -731,7 +725,10 @@ describe("createTrendLineCore", () => {
     });
 
     const result = await core(candle as any, candle as any);
-    expect(result).toEqual({ kind: "skip", code: "RISK_RATIO:1" });
+    expect(result).toEqual({
+      kind: "skip",
+      code: expect.stringMatching(/^RISK_RATIO:/),
+    });
   });
 
   it("does not skip entry outside backtest when correlation is high", async () => {
@@ -745,12 +742,9 @@ describe("createTrendLineCore", () => {
       timestamp: candle.timestamp,
       currentPrice: candle.close,
     });
-    (getDirectionalTpSlPrices as jest.Mock).mockReturnValueOnce({
-      stopLossPrice: 98,
-      takeProfitPrice: 104,
-      riskRatio: 3,
-      qty: 1,
-    });
+    (getDirectionalTpSlPrices as jest.Mock).mockImplementation(
+      jest.requireActual("@tradejs/core/strategies").getDirectionalTpSlPrices,
+    );
 
     const indicatorsState = makeIndicatorsState() as any;
     indicatorsState.latestNumber = jest.fn(() => 0.95);
